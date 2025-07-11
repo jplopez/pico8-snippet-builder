@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en" xml:lang="en" data-bs-theme="dark">
+
+<head>
+  <meta charset="utf-8">
+  <title>Pico-8 Snippet Builder</title>
+  <!-- Bootstrap 5 CDN -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <!-- Prism.js for syntax highlighting -->
+  <link href="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet" />
+  <script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/prism.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/components/prism-lua.min.js"></script>
+  <script src="pis-core.js"></script>
+  <style>
+    .snippet {
+      border: 1px solid #cccccc;
+      margin-bottom: 1em;
+      padding: 1em;
+      min-height: 180px;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-start;
+    }
+
+    .snippet input {
+      margin-right: 1em;
+    }
+
+    #output {
+      width: 100%;
+      height: 200px;
+    }
+
+    #actionBar {
+      position: fixed;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: #fff;
+      border-top: 2px solid #ccc;
+      box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.07);
+      padding: 1em 2em;
+      z-index: 100;
+      display: flex;
+      align-items: center;
+      gap: 1em;
+    }
+
+    #actionBar label {
+      margin-bottom: 0;
+    }
+
+    #actionBar button {
+      font-size: 1.1em;
+    }
+
+    body {
+      padding-bottom: 90px;
+    }
+
+    .snippets-list .snippet {
+      width: 100%;
+    }
+
+    .snippets-grid {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1em;
+    }
+    
+ 
+    .snippets-grid .snippet {
+      flex: 1 1 calc(33.333% - 1em);
+      max-width: calc(33.333% - 1em);
+      min-width: 250px;
+    }
+
+    /* Prism.js overrides for better readability */
+    pre[class*="language-"] {
+      background: #22223b !important;
+      color: #f2e9e1 !important;
+      border-radius: 6px;
+      padding: 0.75em;
+      font-size: 1em;
+      margin-top: 0.5em;
+      min-height: 200px;
+      overflow-x: auto;
+    }
+
+    code[class*="language-"] {
+      font-family: 'Fira Mono', 'Consolas', 'Menlo', 'Monaco', monospace;
+      font-size: small;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container overflow-hidden my-4">
+    <div class="row my-3">
+      <div class="col-md-auto offset-md-1">
+        <img src="https://www.lexaloffle.com/gfx/pico8_logo_vector.png" style="width: 150px;" alt="pico-8 logo">
+      </div>
+      <div class="col">
+        <h1 class="mb-3">Pico-8 Snippet Builder</h1>
+      </div>
+    </div>
+    <div class="row my-3">
+      <div class="col-md-10 offset-md-1">
+        <h3>What is this?</h3>
+        <p>This is a collection of code snippets for Pico-8 that I've gathered over time. From single functions to
+          entire toolkits or framewors.</p>
+        <p>This tool generates a single lua file, merging all the snippet you choose.</p>
+        <h3>How to use?</h3>
+        <p>Mark the code snippets you want and then select "Generate & Download" at the bottom. A download should start
+          promptly.</p>
+        <p>If you prefer, you can edit the code or copy to clipboard with the button controls to the right of each
+          snippet.</p>
+      </div>
+    </div>
+
+    <!-- Control Panel for Layout -->
+    <div class="mb-3 d-flex align-items-center gap-3">
+      <label class="fw-bold mb-0 text-info-emphasis">Layout:</label>
+      <div class="btn-group" role="group" aria-label="Layout options">
+        <button type="button" class="btn btn-outline-info active" id="layoutListBtn"
+          onclick="setLayout('list')">List</button>
+        <button type="button" class="btn btn-outline-info" id="layoutGridBtn"
+          onclick="setLayout('grid')">Grid</button>
+      </div>
+    </div>
+
+    <form id="snippetsForm">
+        <div id="snippetsSections" class="accordion">
+        <!-- Collapsible sections for each folder will be rendered here by JS -->
+      </div>
+    </form>
+
+  </div>
+
+  <!-- Floating action bar -->
+  <div id="actionBar" class="shadow bg-body-secondary border border-top border-dark-subtle">
+    <span id="selectedCount" class="text-info-emphasis me-3">Selected 0 snippets</span>
+    <button type="button" class="btn btn-primary me-2" onclick="generateFile(false)">Build File</button>
+    <button type="button" class="btn btn-secondary" onclick="generateFile(true)">Build Min File</button>
+  </div>
+
+  <!-- Toast notification -->
+  <div class="position-fixed bottom-0 end-0 p-3" style="z-index: 1100">
+    <div id="copyToast" class="toast align-items-center text-bg-dark border-0" role="alert" aria-live="assertive"
+      aria-atomic="true">
+      <div class="d-flex">
+        <div class="toast-body" id="copyToastBody">
+          <!-- Message will be set dynamically -->
+        </div>
+        <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"
+          aria-label="Close"></button>
+      </div>
+    </div>
+  </div>
+
+</body>
+
+</html>
